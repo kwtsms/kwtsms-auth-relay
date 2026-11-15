@@ -1,0 +1,90 @@
+{
+  "name": "kwtsms-auth-relay",
+  "version": "0.1.0",
+  "description": "Send Clerk and Neon Auth SMS (OTP) through kwtSMS",
+  "license": "MIT",
+  "author": "kwtSMS (BoxLink Center)",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./clerk": {
+      "import": {
+        "types": "./dist/clerk.d.ts",
+        "default": "./dist/clerk.js"
+      },
+      "require": {
+        "types": "./dist/clerk.d.cts",
+        "default": "./dist/clerk.cjs"
+      }
+    },
+    "./neon": {
+      "import": {
+        "types": "./dist/neon.d.ts",
+        "default": "./dist/neon.js"
+      },
+      "require": {
+        "types": "./dist/neon.d.cts",
+        "default": "./dist/neon.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "clerk",
+    "neon-auth",
+    "kwtsms",
+    "sms",
+    "otp",
+    "webhook",
+    "kuwait",
+    "authentication"
+  ],
+  "homepage": "https://github.com/kwtsms/kwtsms-auth-relay#readme",
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "kwtsms": "0.6.0",
+    "svix": "^1.99.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "eslint": "^10.15.0",
+    "tsup": "^9.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwtsms/kwtsms-auth-relay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kwtsms/kwtsms-auth-relay/issues"
+  }
+}
