@@ -85,7 +85,7 @@ export function createOktaHandler(options: OktaHandlerOptions): (req: Request) =
   if (!secret) throw new Error(`${TAG} secret (or env OKTA_HOOK_SECRET) is required`);
   if (secret.length < MIN_SECRET) throw new Error(`${TAG} the Okta hook secret must be at least ${MIN_SECRET} characters`);
   const header = (options.authHeader ?? "authorization").toLowerCase();
-  // Okta waits 3 s, so answer before that; no resend cooldown (Okta paces resends), 10 per number per hour
+  // Okta waits 3 s, so answer before that; no resend cooldown (a refusal only hands the send back to Okta), 10 per number per hour
   const relay = createRelay({ cooldownSeconds: 0, maxPerHour: 10, sendTimeoutMs: 2500, ...options });
 
   function buildText(r: OktaTelephonyRequest, code: string): string {

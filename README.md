@@ -8,7 +8,7 @@
 [![CI](https://github.com/kwtsms/kwtsms-auth-relay/actions/workflows/ci.yml/badge.svg)](https://github.com/kwtsms/kwtsms-auth-relay/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Send the SMS of [Clerk](https://clerk.com) and [Neon Auth](https://neon.com/docs/auth) through kwtSMS, the Kuwaiti SMS gateway. Your auth provider makes the code and calls a webhook; this package checks the signature and sends the text. Test mode by default.
+Send the SMS of [Clerk](https://clerk.com), [Neon Auth](https://neon.com/docs/auth) and [Okta](https://www.okta.com) through kwtSMS, the Kuwaiti SMS gateway. Your auth provider makes the code and calls a webhook; this package checks the signature and sends the text. Test mode by default.
 
 ## About kwtSMS
 
@@ -69,6 +69,42 @@ Only OTPs with `delivery_preference: "sms"` are sent. The text is `Shop: your co
 Local testing: expose your dev server with a tunnel (for example `cloudflared tunnel --url http://localhost:3000`) and register the tunnel URL as the webhook.
 
 Step-by-step guides: [guides/neon-auth.md](guides/neon-auth.md) (with screenshots).
+
+## Okta
+
+Okta allows one telephony inline hook per org. When it is active, Okta sends every SMS and voice sign-in code to your hook instead of its own providers.
+
+1. Add the route:
+
+```ts
+// app/api/okta-sms/route.ts (Next.js)
+import { createOktaHandler } from "kwtsms-auth-relay/okta";
+
+export const POST = createOktaHandler({
+  kwtsms: {
+    username: process.env.KWTSMS_USERNAME,
+    password: process.env.KWTSMS_PASSWORD,
+    senderId: process.env.KWTSMS_SENDER_ID,
+    live: process.env.KWTSMS_LIVE === "1",
+  },
+  appName: "Shop",
+});
+```
+
+2. In the Okta Admin Console open **Workflow, Inline Hooks, Add Inline Hook, Telephony**. Enter your route URL (public HTTPS), set **Authentication field** to `authorization` and **Authentication secret** to a long random value. Put the same value in `OKTA_HOOK_SECRET` (at least 16 characters), or pass `secret`. A different header name goes in `authHeader`.
+
+How it answers Okta:
+
+| Case | Answer |
+| --- | --- |
+| Live mode, kwtSMS accepted the SMS | `SUCCESSFUL`, provider `kwtSMS`, the kwtSMS msg-id as `transactionId` |
+| Test mode (default) | The SMS is queued with `test=1`, then an error object. Okta then sends the code through its own providers, so nobody is locked out while you test. `reportTestAsSuccess: true` answers `SUCCESSFUL` instead (for the Preview tab only: the code is not delivered) |
+| Voice call, refused number, hourly cap, kwtSMS `ERR` code, timeout | An error object. Okta falls back to its own providers |
+| Wrong or missing secret | 401 |
+
+Okta waits 3 seconds for the answer, so the handler stops waiting for kwtSMS after 2.5 seconds (`sendTimeoutMs`). If kwtSMS accepts the message after that, Okta also sends the code through its own providers, so the user can get it twice. Run the route close to the internet, not on a cold-starting function, to keep this rare.
+
+Okta defaults differ from Clerk and Neon: no resend cooldown (`cooldownSeconds: 0`) and `maxPerHour: 10`. A refused send is handed back to Okta, so a limit saves your credits but does not stop Okta from sending. The built-in text is Arabic when the Okta user's locale starts with `ar`, else English; `message` and `lang` work as for Neon (`{code}` and `{app}`). Okta's own message template is not used.
 
 ## Express
 
