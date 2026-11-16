@@ -45,6 +45,8 @@ export const POST = createClerkHandler({
 
 The signing secret is read from `CLERK_WEBHOOK_SIGNING_SECRET`, or pass `signingSecret`. The text Clerk built is sent as is (cleaned for SMS). To send your own text, for example in Arabic, use `message`: a string with `{message}`, `{app}` and any key of Clerk's `data` such as `{otp_code}`, or a function that receives Clerk's SMS data.
 
+Step-by-step guides: [guides/clerk.md](guides/clerk.md) (with screenshots).
+
 ## Neon Auth
 
 1. In Neon Auth, register a webhook for the blocking event `send.otp` pointing at your route.
@@ -65,6 +67,8 @@ export const POST = createNeonHandler({
 Only OTPs with `delivery_preference: "sms"` are sent. The text is `Shop: your code is 123456. Valid 5 min. Do not share it.` (English, one SMS part) or the Arabic equivalent (one part). Use `message` to replace it: a string with `{code}`, `{app}` and `{otp_type}`, or a function that receives the payload. The built-in text says "Valid 5 min", so set `message` if your expiry differs.
 
 Local testing: expose your dev server with a tunnel (for example `cloudflared tunnel --url http://localhost:3000`) and register the tunnel URL as the webhook.
+
+Step-by-step guides: [guides/neon-auth.md](guides/neon-auth.md) (with screenshots).
 
 ## Express
 
