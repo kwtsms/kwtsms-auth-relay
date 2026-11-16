@@ -197,7 +197,8 @@ What your route answers, as the code behaves:
 | `200 {"status":"skipped","reason":"missing_fields"}` | The payload has no code or no phone number. | Check the user has a phone number and the request came from the Phone Number plugin. |
 | `200 {"status":"refused","reason":"COUNTRY_NOT_ALLOWED"}` | The number is outside `allowedCountries` (default Kuwait only). | Add the country code, for example `allowedCountries: ["965", "971"]`. |
 | `200 {"status":"refused","reason":"INVALID_PHONE"}` | The number could not be read as a valid phone number. | Use a full international number. |
-| `200 {"status":"refused","reason":"COOLDOWN"}` | The same number asked again inside the cooldown (default 60 s) or passed the hourly cap (default 5). | Wait, or change `cooldownSeconds` / `maxPerHour`. |
+| `200 {"status":"refused","reason":"COOLDOWN"}` | The same number asked again inside the cooldown (default 60 s). | Wait, or change `cooldownSeconds`. |
+| `200 {"status":"refused","reason":"RATE_LIMIT"}` | The number passed the hourly cap (default 5 SMS per hour). | Wait, or change `maxPerHour`. |
 | `200 {"status":"duplicate"}` | Neon retried an event that was already handled. Nothing is sent twice. | Normal. |
 | `200 {"status":"failed","code":"ERR..."}` | kwtSMS answered with an error, for example a wrong API username or password, an unapproved Sender ID or an empty balance. The `ERR` code is logged with a masked number. `200` is returned on purpose so Neon does not retry and repeat the send. | Look up the code at https://www.kwtsms.com/api-documentation.html . Use `onError` to alert yourself. |
 | `200 {"status":"failed","code":"MESSAGE_BUILDER"}` | Your `message` function threw an error. | Fix the function. |
