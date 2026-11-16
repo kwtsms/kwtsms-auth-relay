@@ -14,6 +14,8 @@ export interface SendOutcome {
   result: string;
   code?: string;
   description?: string;
+  /** kwtSMS msg-id on OK. 2026-11-16 20:40 +03: added for the Okta transactionId, job 60 int-okta */
+  msgId?: string;
 }
 
 /**
@@ -61,7 +63,7 @@ export interface RelayOptions {
 }
 
 export type RelayResult =
-  | { status: "sent" }
+  | { status: "sent"; msgId?: string } // 2026-11-16 20:40 +03: msgId for Okta, job 60
   | { status: "failed"; code?: string }
   | { status: "duplicate" }
   | { status: "refused"; reason: "INVALID_PHONE" | "COUNTRY_NOT_ALLOWED" | "COOLDOWN" | "RATE_LIMIT" | "EMPTY_MESSAGE" }
@@ -107,6 +109,8 @@ export function fillTemplate(tpl: string, vars: Record<string, unknown>): string
 export interface Relay {
   send(input: { phone: string; message: string; eventKey?: string }): Promise<RelayResult>;
   appName: string;
+  /** 2026-11-16 20:40 +03: true = kwtSMS live mode (Okta reports test mode as an error), job 60 */
+  live: boolean;
 }
 
 export function createRelay(options: RelayOptions): Relay {
@@ -154,7 +158,9 @@ export function createRelay(options: RelayOptions): Relay {
         if (r.result !== "OK" && r.code === "NETWORK" && NOT_SENT_RE.test(desc)) {
           return { result: "ERROR", code: "NOT_SENT", description: desc };
         }
-        return { result: r.result, code: r.code, description: r.description };
+        // 2026-11-16 20:40 +03: pass msg-id through (Okta transactionId), job 60 int-okta
+        const id = (r as Record<string, unknown>)["msg-id"];
+        return { result: r.result, code: r.code, description: r.description, msgId: id == null ? undefined : String(id) };
       },
     };
     return built;
@@ -230,7 +236,7 @@ export function createRelay(options: RelayOptions): Relay {
       report({ code: e instanceof Error ? e.name : "ERROR", phone: masked });
       return { status: "not_sent" };
     }
-    if (res.result === "OK") return { status: "sent" };
+    if (res.result === "OK") return { status: "sent", msgId: res.msgId };
     if (res.code === "NOT_SENT") {
       await rollback();
       report({ code: res.code, description: res.description, phone: masked });
@@ -240,7 +246,7 @@ export function createRelay(options: RelayOptions): Relay {
     return { status: "failed", code: res.code };
   }
 
-  return { send, appName };
+  return { send, appName, live };
 }
 
 export function readEnv(name: string): string | undefined {

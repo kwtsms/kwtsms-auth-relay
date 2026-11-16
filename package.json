@@ -1,7 +1,7 @@
 {
   "name": "kwtsms-auth-relay",
   "version": "0.1.0",
-  "description": "Send Clerk and Neon Auth SMS (OTP) through kwtSMS",
+  "description": "Send Clerk, Neon Auth and Okta SMS sign-in codes (OTP) through kwtSMS",
   "license": "MIT",
   "author": "kwtSMS (BoxLink Center)",
   "type": "module",
@@ -39,6 +39,16 @@
         "default": "./dist/neon.cjs"
       }
     },
+    "./okta": {
+      "import": {
+        "types": "./dist/okta.d.ts",
+        "default": "./dist/okta.js"
+      },
+      "require": {
+        "types": "./dist/okta.d.cts",
+        "default": "./dist/okta.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -56,7 +66,9 @@
     "otp",
     "webhook",
     "kuwait",
-    "authentication"
+    "authentication",
+    "okta",
+    "telephony-inline-hook"
   ],
   "homepage": "https://github.com/kwtsms/kwtsms-auth-relay#readme",
   "scripts": {

@@ -9,7 +9,8 @@ WHY:       Subpath exports keep svix (Clerk) and jose (Neon) out of the bundle t
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/clerk.ts", "src/neon.ts"],
+  // 2026-11-16 20:50 +03: okta entry, job 60 int-okta
+  entry: ["src/index.ts", "src/clerk.ts", "src/neon.ts", "src/okta.ts"],
   format: ["esm", "cjs"],
   dts: true,
   clean: true,
