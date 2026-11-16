@@ -10,7 +10,8 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   // 2026-11-16 20:50 +03: okta entry, job 60 int-okta
-  entry: ["src/index.ts", "src/clerk.ts", "src/neon.ts", "src/okta.ts"],
+  // 2026-11-16 22:01 +03: wso2 entry, job 63
+  entry: ["src/index.ts", "src/clerk.ts", "src/neon.ts", "src/okta.ts", "src/wso2.ts"],
   format: ["esm", "cjs"],
   dts: true,
   clean: true,

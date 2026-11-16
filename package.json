@@ -49,6 +49,16 @@
         "default": "./dist/okta.cjs"
       }
     },
+    "./wso2": {
+      "import": {
+        "types": "./dist/wso2.d.ts",
+        "default": "./dist/wso2.js"
+      },
+      "require": {
+        "types": "./dist/wso2.d.cts",
+        "default": "./dist/wso2.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -68,6 +78,8 @@
     "kuwait",
     "authentication",
     "okta",
+    "wso2",
+    "asgardeo",
     "telephony-inline-hook"
   ],
   "homepage": "https://github.com/kwtsms/kwtsms-auth-relay#readme",

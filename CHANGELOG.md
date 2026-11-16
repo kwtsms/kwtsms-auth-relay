@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- WSO2 Identity Server and Asgardeo: a custom SMS provider handler (`kwtsms-auth-relay/wso2`) sends WSO2 SMS through kwtSMS.
+- Authgear: a Custom SMS Gateway script that sends Authgear SMS through kwtSMS directly (recipes/authgear-custom-sms.ts).
 - Okta: a Telephony Inline Hook handler (`kwtsms-auth-relay/okta`) sends Okta SMS sign-in codes through kwtSMS and answers Okta in its own format. Anything not delivered (test mode, voice calls, refused numbers, kwtSMS errors) is handed back so Okta sends the code itself.
 
 ## [0.1.0] - 2026-11-16

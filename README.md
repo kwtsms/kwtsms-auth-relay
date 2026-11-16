@@ -8,7 +8,7 @@
 [![CI](https://github.com/kwtsms/kwtsms-auth-relay/actions/workflows/ci.yml/badge.svg)](https://github.com/kwtsms/kwtsms-auth-relay/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Send the SMS of [Clerk](https://clerk.com), [Neon Auth](https://neon.com/docs/auth) and [Okta](https://www.okta.com) through kwtSMS, the Kuwaiti SMS gateway. Your auth provider makes the code and calls a webhook; this package checks the signature and sends the text. Test mode by default.
+Send the SMS of [Clerk](https://clerk.com), [Neon Auth](https://neon.com/docs/auth), [Okta](https://www.okta.com) and [WSO2 Identity Server](https://wso2.com/identity-server/) through kwtSMS, the Kuwaiti SMS gateway. Your auth provider makes the code and calls a webhook; this package checks the signature and sends the text. Test mode by default.
 
 ## About kwtSMS
 
@@ -105,6 +105,44 @@ How it answers Okta:
 Okta waits 3 seconds for the answer, so the handler stops waiting for kwtSMS after 2.5 seconds (`sendTimeoutMs`). If kwtSMS accepts the message after that, Okta also sends the code through its own providers, so the user can get it twice. Run the route close to the internet, not on a cold-starting function, to keep this rare.
 
 Okta defaults differ from Clerk and Neon: no resend cooldown (`cooldownSeconds: 0`) and `maxPerHour: 10`. A refused send is handed back to Okta, so a limit saves your credits but does not stop Okta from sending. The built-in text is Arabic when the Okta user's locale starts with `ar`, else English; `message` and `lang` work as for Neon (`{code}` and `{app}`). Okta's own message template is not used.
+
+## WSO2 Identity Server
+
+WSO2 Identity Server 7.x (and Asgardeo) can post every SMS to a custom provider. The handler takes that post and sends the text through kwtSMS. WSO2 sends numbers with a `+`, which the kwtSMS API does not accept, so WSO2 cannot post to kwtSMS directly.
+
+1. Add the route:
+
+```ts
+// app/api/wso2-sms/route.ts (Next.js)
+import { createWso2Handler } from "kwtsms-auth-relay/wso2";
+
+export const POST = createWso2Handler({
+  kwtsms: {
+    username: process.env.KWTSMS_USERNAME,
+    password: process.env.KWTSMS_PASSWORD,
+    senderId: process.env.KWTSMS_SENDER_ID,
+    live: process.env.KWTSMS_LIVE === "1",
+  },
+});
+```
+
+2. In the WSO2 Console open **Notification Channels, SMS Provider, Custom** and fill in:
+
+| Field | Value |
+| --- | --- |
+| SMS Provider URL | your route URL (public HTTPS) |
+| Content Type | `JSON` |
+| HTTP Method | `POST` |
+| Payload Template | `{"to": {{mobile}}, "content": {{body}}}` |
+| Headers | `authorization: <a long random value>` |
+
+Put the same random value in `WSO2_SMS_SECRET` (at least 16 characters), or pass `secret`. WSO2 writes the text itself (its SMS templates), so `message` and `lang` are not used here.
+
+How it answers WSO2: 200 when kwtSMS accepted the message (`"test": true` in test mode, the message is queued, not delivered), 422 for a refused number or limit, 502 with the kwtSMS `ERR` code, 503 when kwtSMS did not answer, 401 for a wrong secret. Any answer other than 200 makes WSO2 report the send as failed. Defaults: no resend cooldown, `maxPerHour: 10`.
+
+## Authgear (no relay needed)
+
+Authgear's Custom SMS Gateway (enterprise plan) runs your own script, so it can call kwtSMS directly. Paste [recipes/authgear-custom-sms.ts](recipes/authgear-custom-sms.ts) into **Advanced, Custom SMS Gateway, Custom JS/TS**, set your API username, password and Sender ID, and click **Test**. It starts in test mode; set `TEST_MODE = false` to deliver. kwtSMS errors map to Authgear's answer codes (`authentication_failed`, `invalid_phone_number`, `rate_limited`, `delivery_rejected`) with the `ERR` code shown in the Authgear Portal.
 
 ## Express
 
