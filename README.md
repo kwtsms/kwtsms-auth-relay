@@ -45,7 +45,7 @@ export const POST = createClerkHandler({
 
 The signing secret is read from `CLERK_WEBHOOK_SIGNING_SECRET`, or pass `signingSecret`. The text Clerk built is sent as is (cleaned for SMS). To send your own text, for example in Arabic, use `message`: a string with `{message}`, `{app}` and any key of Clerk's `data` such as `{otp_code}`, or a function that receives Clerk's SMS data.
 
-Step-by-step guides: [guides/clerk.md](guides/clerk.md) (with screenshots).
+Step-by-step guide: [guides/clerk.md](guides/clerk.md) (with screenshots), also on [kwtsms.com/integrations/clerk.html](https://www.kwtsms.com/integrations/clerk.html) in English and Arabic.
 
 ## Neon Auth
 
@@ -68,7 +68,7 @@ Only OTPs with `delivery_preference: "sms"` are sent. The text is `Shop: your co
 
 Local testing: expose your dev server with a tunnel (for example `cloudflared tunnel --url http://localhost:3000`) and register the tunnel URL as the webhook.
 
-Step-by-step guides: [guides/neon-auth.md](guides/neon-auth.md) (with screenshots).
+Step-by-step guide: [guides/neon-auth.md](guides/neon-auth.md) (with screenshots), also on [kwtsms.com/integrations/neon-auth.html](https://www.kwtsms.com/integrations/neon-auth.html) in English and Arabic.
 
 ## Okta
 
